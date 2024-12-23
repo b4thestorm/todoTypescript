@@ -43,8 +43,10 @@ app.post("/create", (request, response) => {
 });
 //UPDATE /update/:id todos
 app.put("/update/:id", (request, response) => {
+    const id = Number(request.params.id);
     const params = request.query;
-    if (checkDoesExist(params.id)) {
+    if (checkDoesExist(id)) {
+        params["id"] = id;
         container[params.id] = params;
         response.status(201).send("200 Ok");
     }
@@ -54,10 +56,10 @@ app.put("/update/:id", (request, response) => {
 });
 //DELETE /delete/:id  #delete todo
 app.delete("/delete/:id", (request, response) => {
-    const params = request.query;
-    let index = container.findIndex((todo) => { Number(todo.id) === Number(params.id); });
-    if (index) {
-        container = container.filter(todo => Number(todo.id) !== Number(params.id));
+    const id = Number(request.params.id);
+    let index = container.findIndex((todo) => { Number(todo.id) === id; });
+    if (index !== -1) {
+        container = container.filter(todo => Number(todo.id) !== id);
         response.status(201).send("resource was deleted");
     }
     else {
@@ -67,3 +69,4 @@ app.delete("/delete/:id", (request, response) => {
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
 });
+module.exports = app;

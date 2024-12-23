@@ -1,11 +1,11 @@
-const request = require("supertest");
-const app = require("../dist/index.js");
+let request = require("supertest");
+let app = require("../dist/index.js")
+
 
 describe("POST /create", () => {
   it('should create a new todo', async ()=> {
     const todo = {id: 1, message: "make software", status: "doing"}
     const response = await request(app).post('/create').send(todo);
-
     expect(response.statusCode).toBe(201);
   });
 
@@ -13,7 +13,7 @@ describe("POST /create", () => {
     const todo = {id: 1, message: "make software", status: "doing"}
     const todo2 = {id: 1, message: "make software", status: "doing"}
 
-    await request(app).post('/create').send(todo1);
+    await request(app).post('/create').send(todo);
     const response2 = await request(app).post('/create').send(todo2);
 
     expect(response2.statusCode).toBe(400);
@@ -37,8 +37,9 @@ describe("PUT /update/:id", ()=> {
     const response1 = await request(app).put('/update/2').send(todo1);
     expect(response1.statusCode).toBe(404)
   })
+})
 
- describe("DELETE /delete/:id", ()=> {
+describe("DELETE /delete/:id", ()=> {
   beforeEach(async () => {
     const todo = {id: 1, message: "make software", status: "doing"}
     await request(app).post('/create').send(todo);
@@ -50,8 +51,7 @@ describe("PUT /update/:id", ()=> {
     })
 
     it('should not delete a todo', async () => { 
-      const response1 = await request(app).delete('/delete/2').send({id: 2});
+      const response1 = await request(app).delete('/delete/2').send({id: 10});
       expect(response1.statusCode).toBe(404)
     })
- })
 })

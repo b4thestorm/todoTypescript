@@ -45,9 +45,10 @@ app.post("/create", (request: Request, response: Response) => {
 
 //UPDATE /update/:id todos
 app.put("/update/:id", (request: Request, response: Response) => {
+    const id: number = Number(request.params.id)
     const params: Todo = request.query as unknown as Todo
-    if (checkDoesExist(params.id)) {
-        params["id"] = Number(params.id)
+    if (checkDoesExist(id)) {
+        params["id"] = id
         container[params.id] = params
         response.status(201).send("200 Ok")
     } else {
@@ -57,10 +58,10 @@ app.put("/update/:id", (request: Request, response: Response) => {
 
 //DELETE /delete/:id  #delete todo
 app.delete("/delete/:id", (request: Request, response: Response) => {
-    const params: Todo = request.query as unknown as Todo
-    let index = container.findIndex((todo: Todo) => {Number(todo.id) === Number(params.id)})
-    if (index) {
-        container = container.filter(todo => Number(todo.id) !== Number(params.id));
+    const id: number = Number(request.params.id)
+    let index = container.findIndex((todo: Todo) => {Number(todo.id) === id})
+    if (index !== -1) {
+        container = container.filter(todo => Number(todo.id) !== id);
         response.status(201).send("resource was deleted")
     } else {
         response.status(404).send("resource doesnt exist")
@@ -70,3 +71,5 @@ app.delete("/delete/:id", (request: Request, response: Response) => {
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`)
 })
+
+module.exports = app
