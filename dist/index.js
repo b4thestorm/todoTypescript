@@ -36,9 +36,9 @@ app.post("/create", (request, response) => {
         response.status(400).send("resource already exist");
     }
     else {
-        params["id"] = Number(params.id); //force type to be number from postman
+        params["id"] = Number(params.id);
         container.push(params);
-        response.status(201).send("200 Ok"); //confirm successful todo entry 
+        response.status(201).send("200 Ok");
     }
 });
 //UPDATE /update/:id todos

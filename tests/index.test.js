@@ -1,3 +1,4 @@
+const { setMaxIdleHTTPParsers } = require("http");
 let request = require("supertest");
 let app = require("../dist/index.js")
 
@@ -9,14 +10,12 @@ describe("POST /create", () => {
     expect(response.statusCode).toBe(201);
   });
 
-  it('should not create a duplicate todo', async ()=> {
+  it('should not create a duplicate todo',  ()=> {
     const todo = {id: 1, message: "make software", status: "doing"}
     const todo2 = {id: 1, message: "make software", status: "doing"}
 
-    await request(app).post('/create').send(todo);
-    const response2 = await request(app).post('/create').send(todo2);
-
-    expect(response2.statusCode).toBe(400);
+    request(app).post('/create').send(todo);
+    request(app).post('/create').send(todo2).expect(400)
   });
 })
 
@@ -26,16 +25,14 @@ describe("PUT /update/:id", ()=> {
     await request(app).post('/create').send(todo);
   });
 
-  it('should update a todo', async ()=>{
+  it('should update a todo', ()=>{
     const todo1 = {id: 1, message: "making software", status: "doing"}
-    const response = await request(app).put('/update/1').send(todo1);
-    expect(response.statusCode).toBe(201)
+    request(app).put('/update/1').send(todo1).expect(201)
   })
   
-  it('should not update a non existing todo', async () => {
+  it('should not update a non existing todo', () => {
     const todo1 = {id: 2, message: "making software", status: "doing"}
-    const response1 = await request(app).put('/update/2').send(todo1);
-    expect(response1.statusCode).toBe(404)
+    request(app).put('/update/2').send(todo1).expect(404)
   })
 })
 
@@ -45,13 +42,11 @@ describe("DELETE /delete/:id", ()=> {
     await request(app).post('/create').send(todo);
   });
 
-    it('should delete a todo', async () => {
-      const response1 = await request(app).delete('/delete/1').send({id: 1});
-      expect(response1.statusCode).toBe(201)
+    it('should delete a todo', () => {
+      request(app).delete('/delete/1').send({id: 1}).expect(201)
     })
 
-    it('should not delete a todo', async () => { 
-      const response1 = await request(app).delete('/delete/2').send({id: 10});
-      expect(response1.statusCode).toBe(404)
+    it('should not delete a todo', () => { 
+      request(app).delete('/delete/2').send({id: 10}).expect(404)
     })
 })
