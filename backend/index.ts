@@ -1,4 +1,3 @@
-//Basic Todo API
 import express, {Express, Request, Response} from "express";
 import dotenv from "dotenv";
 import bodyparser from 'body-parser'
@@ -6,7 +5,7 @@ import bodyparser from 'body-parser'
 dotenv.config();
 
 const app: Express  = express();
-const port: string | number = process.env.PORT || 3000;
+const port: string | number = process.env.PORT || 3001;
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({extended: true}))
 

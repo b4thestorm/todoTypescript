@@ -1,4 +1,3 @@
-const { setMaxIdleHTTPParsers } = require("http");
 let request = require("supertest");
 let app = require("../dist/index.js")
 
