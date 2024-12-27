@@ -1,6 +1,7 @@
 import express, {Express, Request, Response} from "express";
 import dotenv from "dotenv";
 import bodyparser from 'body-parser'
+import cors from 'cors'
 
 dotenv.config();
 
@@ -9,6 +10,14 @@ const port: string | number = process.env.PORT || 3001;
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({extended: true}))
 
+var corsOptions = {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'PUT', 'POST', 'DELETE']
+}
+
+app.use(cors(corsOptions))
+
+  
 let container: Todo[] = [{id: 0, message: "get a job", status: "doing"}] // temp storage so when server shuts off will disappear
 
 const checkDoesExist = (id: number):boolean => {
@@ -26,7 +35,8 @@ app.get("/", (request: Request, response: Response) => {
 })
 
 //GET /list #list todos
-app.get("/list", (request: Request, response: Response) => {
+app.get("/list" , (request: Request, response: Response) => {
+    console.log(`[server: GET ${request.path}`)
     response.status(201).send(container)
 })
 

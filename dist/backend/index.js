@@ -6,11 +6,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3001;
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
+var corsOptions = {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'PUT', 'POST', 'DELETE']
+};
+app.use((0, cors_1.default)(corsOptions));
 let container = [{ id: 0, message: "get a job", status: "doing" }]; // temp storage so when server shuts off will disappear
 const checkDoesExist = (id) => {
     let exists = false;
@@ -26,6 +32,7 @@ app.get("/", (request, response) => {
 });
 //GET /list #list todos
 app.get("/list", (request, response) => {
+    console.log(`[server: GET ${request.path}`);
     response.status(201).send(container);
 });
 //POST /create #add todos
