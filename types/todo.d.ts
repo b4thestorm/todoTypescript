@@ -1,5 +1,5 @@
-interface Todo {
+export default interface Todo {
     id: number;
     message: string;
-    status: string;
+    status: boolean;
   }

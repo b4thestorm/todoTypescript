@@ -52,6 +52,7 @@ const page_module_css_1 = __importDefault(require("./page.module.css"));
 const card_1 = __importDefault(require("./components/card"));
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 function Home() {
+    const [todo, setTodo] = (0, react_1.useState)([]);
     function getData() {
         return __awaiter(this, void 0, void 0, function* () {
             const url = "http://localhost:3001/list";
@@ -68,7 +69,6 @@ function Home() {
             }
         });
     }
-    const [todo, setTodo] = (0, react_1.useState)([]);
     (0, react_1.useEffect)(() => {
         getData();
     }, []);
@@ -76,7 +76,7 @@ function Home() {
       <main className={page_module_css_1.default.main}>
       <>
       <h1>Todo App</h1>
-          {todo.map((task) => (<card_1.default key={task["id"]} todo={task}/>))}
+          {todo.map((task) => (<card_1.default key={task.id} todo={task}/>))}
       </>
       </main>
       

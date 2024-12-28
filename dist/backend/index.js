@@ -17,7 +17,7 @@ var corsOptions = {
     methods: ['GET', 'PUT', 'POST', 'DELETE']
 };
 app.use((0, cors_1.default)(corsOptions));
-let container = [{ id: 0, message: "get a job", status: "doing" }]; // temp storage so when server shuts off will disappear
+let container = [{ id: 0, message: "get a job", status: true }]; // temp storage so when server shuts off will disappear
 const checkDoesExist = (id) => {
     let exists = false;
     container.forEach((todo) => {

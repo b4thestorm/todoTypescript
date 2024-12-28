@@ -18,7 +18,7 @@ var corsOptions = {
 app.use(cors(corsOptions))
 
   
-let container: Todo[] = [{id: 0, message: "get a job", status: "doing"}] // temp storage so when server shuts off will disappear
+let container: Todo[] = [{id: 0, message: "get a job", status: true}] // temp storage so when server shuts off will disappear
 
 const checkDoesExist = (id: number):boolean => {
     let exists = false
