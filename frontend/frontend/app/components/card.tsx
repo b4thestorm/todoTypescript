@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export default function TodoCard({todo, handleDelete})  {
+export default function TodoCard({todo, setRerender})  {
   // eslint-disable-next-line   @typescript-eslint/no-unused-vars
   const [editable, setEditable] = useState(false)
   const [todoState, setTodoState] = useState({
@@ -35,6 +35,19 @@ export default function TodoCard({todo, handleDelete})  {
       body: JSON.stringify(todoState)
     })
     console.log(response.status)
+  }
+
+  const handleDelete = async (event, id) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:3001/delete/${id}`, {
+        method: "DELETE",
+      })
+      console.log("twas a success",response.status)
+      setRerender(renderCount => renderCount + 1)
+    } catch(error) {
+      console.error("delete not successful", error)
+    }
   }
 
   const messageChange = (event): void => {
