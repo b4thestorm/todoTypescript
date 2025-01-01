@@ -9,6 +9,8 @@ import  TextField  from '@mui/material/TextField';
 import CardActionArea from '@mui/material/CardActionArea';
 import Chip from '@mui/joy/Chip';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export default function TodoCard({todo})  {
@@ -20,14 +22,32 @@ export default function TodoCard({todo})  {
       status: todo.status || false
   })
 
-  // const Change = (): void => {
-  //   setTodoState((prevState) => ({...prevState, status: !prevState.status}))
-  // }
-
   const STATUS = {
     true: 'Done',
     false: 'Doing'
   }
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  const handleDelete = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:3001/delete/${todoState.id}`, {
+        method: "DELETE",
+      })
+      console.log("twas a success",response.status)
+    } catch(error) {
+      console.error("delete not successful", error)
+    }
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const response = await fetch('http://localhost:3001/create', {
+      method: "POST",
+      body: JSON.stringify(todoState)
+    })
+    console.log(response.status)
+  }
+
   const messageChange = (event): void => {
     setTodoState((prevState) => ({...prevState, message: event.target.value})
     )
@@ -42,6 +62,12 @@ export default function TodoCard({todo})  {
             <CardActionArea>
               <CardContent>
                 <CardMedia>
+                <IconButton
+                  sx={{ position: 'absolute', top: 0, right: 0 }}
+                  onClick={handleDelete}
+                >
+                  <CloseIcon />
+                 </IconButton>
                 {!editable ? (
                     <Typography gutterBottom variant="h5" component="div">
                       {todoState.message}
@@ -60,7 +86,7 @@ export default function TodoCard({todo})  {
                     }}
                   />
                   )}
-                </CardMedia>       
+                </CardMedia>    
                 <Box sx={{
                   display: 'flex',
                   flexDirection: 'row',
@@ -70,7 +96,9 @@ export default function TodoCard({todo})  {
                   <Chip>{STATUS[todoState.status]}</Chip>
                   <Switch disabled={!editable} onChange={statusChange} name="status"/>
                   {editable ? (
-                    <Button variant="contained">Confirm</Button>
+                    <>
+                      <Button variant="contained" onClick={handleSubmit}>Confirm</Button>
+                    </>
                     ) : (
                     <Button variant="contained" onClick={()=> setEditable(true)}>Edit</Button>
                   )}

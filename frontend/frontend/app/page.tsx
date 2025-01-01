@@ -39,7 +39,6 @@ export default function Home():any {
           ))}
       </>
       </main>
-      
     </div>
   )
 }

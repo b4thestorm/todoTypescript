@@ -79,6 +79,5 @@ function Home() {
           {todo.map((task) => (<card_1.default key={task.id} todo={task}/>))}
       </>
       </main>
-      
     </div>);
 }

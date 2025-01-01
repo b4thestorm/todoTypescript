@@ -32,6 +32,15 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -48,6 +57,8 @@ const TextField_1 = __importDefault(require("@mui/material/TextField"));
 const CardActionArea_1 = __importDefault(require("@mui/material/CardActionArea"));
 const Chip_1 = __importDefault(require("@mui/joy/Chip"));
 const Box_1 = __importDefault(require("@mui/material/Box"));
+const IconButton_1 = __importDefault(require("@mui/material/IconButton"));
+const Close_1 = __importDefault(require("@mui/icons-material/Close"));
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 function TodoCard({ todo }) {
     // eslint-disable-next-line   @typescript-eslint/no-unused-vars
@@ -57,6 +68,34 @@ function TodoCard({ todo }) {
         message: todo.message || '',
         status: todo.status || false
     });
+    const STATUS = {
+        true: 'Done',
+        false: 'Doing'
+    };
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+    const handleDelete = (event) => __awaiter(this, void 0, void 0, function* () {
+        event.preventDefault();
+        try {
+            const response = yield fetch(`http://localhost:3001/delete/${todoState.id}`, {
+                method: "DELETE",
+            });
+            console.log("twas a success", response.status);
+        }
+        catch (error) {
+            console.error("delete not successful", error);
+        }
+    });
+    const handleSubmit = (event) => __awaiter(this, void 0, void 0, function* () {
+        event.preventDefault();
+        const response = yield fetch('http://localhost:3001/create', {
+            method: "POST",
+            body: JSON.stringify(todoState)
+        });
+        console.log(response.status);
+    });
+    const messageChange = (event) => {
+        setTodoState((prevState) => (Object.assign(Object.assign({}, prevState), { message: event.target.value })));
+    };
     const statusChange = () => {
         setTodoState((prevState) => (Object.assign(Object.assign({}, prevState), { status: !prevState.status })));
     };
@@ -65,22 +104,27 @@ function TodoCard({ todo }) {
             <CardActionArea_1.default>
               <CardContent_1.default>
                 <CardMedia_1.default>
+                <IconButton_1.default sx={{ position: 'absolute', top: 0, right: 0 }} onClick={handleDelete}>
+                  <Close_1.default />
+                 </IconButton_1.default>
                 {!editable ? (<Typography_1.default gutterBottom variant="h5" component="div">
                       {todoState.message}
-                    </Typography_1.default>) : (<TextField_1.default id="outlined-multiline-static" label="What do you want to do with your time" multiline rows={3} sx={{
+                    </Typography_1.default>) : (<TextField_1.default id="outlined-multiline-static" label="What do you want to do with your time" value={todoState.message} onChange={messageChange} multiline rows={3} sx={{
                 width: '360px',
                 height: '60px'
             }}/>)}
-                </CardMedia_1.default>       
+                </CardMedia_1.default>    
                 <Box_1.default sx={{
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
             marginTop: '50px',
         }}>
-                  <Chip_1.default>{todoState.status}</Chip_1.default>
+                  <Chip_1.default>{STATUS[todoState.status]}</Chip_1.default>
                   <Switch_1.default disabled={!editable} onChange={statusChange} name="status"/>
-                  {editable ? (<Button_1.default variant="contained">Confirm</Button_1.default>) : (<Button_1.default variant="contained" onClick={() => setEditable(true)}>Edit</Button_1.default>)}
+                  {editable ? (<>
+                      <Button_1.default variant="contained" onClick={handleSubmit}>Confirm</Button_1.default>
+                    </>) : (<Button_1.default variant="contained" onClick={() => setEditable(true)}>Edit</Button_1.default>)}
                 </Box_1.default>
               </CardContent_1.default>
             </CardActionArea_1.default>

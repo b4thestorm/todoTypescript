@@ -1,7 +1,9 @@
-import express, {Express, Request, Response} from "express";
+import express, {Express, NextFunction, Request, Response} from "express";
+import { Client } from "pg";
 import dotenv from "dotenv";
 import bodyparser from 'body-parser'
 import cors from 'cors'
+import Todo from "../types/todo";
 
 dotenv.config();
 
@@ -10,72 +12,87 @@ const port: string | number = process.env.PORT || 3001;
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({extended: true}))
 
+const db = new Client({
+    user: 'arnoldsanders',
+    host: 'localhost',
+    port: 5432,
+    database: 'locktransaction',
+})
+
+db.connect()
+
 var corsOptions = {
     origin: 'http://localhost:3000',
     methods: ['GET', 'PUT', 'POST', 'DELETE']
 }
 
+
 app.use(cors(corsOptions))
-
-  
-let container: Todo[] = [{id: 0, message: "get a job", status: true}] // temp storage so when server shuts off will disappear
-
-const checkDoesExist = (id: number):boolean => {
-    let exists = false
-    container.forEach((todo) => {
-        if (Number(todo.id) === Number(id)) {
-            exists = true
-        }
-    })
-    return exists
-}   
 
 app.get("/", (request: Request, response: Response) => {
     response.status(201).send("Welcome to another Typescript Todo App");
 })
 
 //GET /list #list todos
-app.get("/list" , (request: Request, response: Response) => {
-    console.log(`[server: GET ${request.path}`)
-    response.status(201).send(container)
+app.get("/list" , async (request: Request, response: Response) => {
+    const res = await db.query('SELECT * FROM todo')
+    response.status(201).send(res.rows)
 })
 
 //POST /create #add todos
-app.post("/create", (request: Request, response: Response) => {
-    const params: Todo = request.query as unknown as Todo
-    if (checkDoesExist(params.id)) {
-        response.status(400).send("resource already exist")
-    } else {
-        params["id"] = Number(params.id)
-        container.push(params)
-        response.status(201).send("200 Ok")
+app.post("/create", async (request, response, next) => {
+    const params = request.query;
+    try {
+        const res = await db.query('SELECT * FROM todo WHERE id=$1', [params.id])
+        if (res.rows.length === 1) {
+            response.status(400).send("resource already exist");
+        }
+    } catch (err) {
+        response.status(500).send("Internal Server Error");
+    }
+}, async (request, response) => { 
+    const params = request.query;
+    try {
+        await db.query('INSERT INTO todo (id, message, status) VALUES ($1, $2, $3)', [params.id, params.message, params.status]);
+        response.status(201).send("200 Ok");
+    } catch (err) {
+        response.status(500).send("Internal Server Error");
     }
 })
 
 //UPDATE /update/:id todos
-app.put("/update/:id", (request: Request, response: Response) => {
-    const id: number = Number(request.params.id)
+app.put("/update/:id", async(request: Request, response: Response, next: NextFunction) => {
     const params: Todo = request.query as unknown as Todo
-    if (checkDoesExist(id)) {
-        params["id"] = id
-        container[params.id] = params
+    try {
+        const res = await db.query('SELECT * FROM todo WHERE id=$1', [params.id])
+        if (res.rows.length === 1) {
+            next()
+        } else {
+            response.status(400).send("resource doesn't exist");
+        }
+    } catch (err) {
+        response.status(500).send("Internal Server Error");
+    }
+}, async(request, response) => {
+    const params: Todo = request.query as unknown as Todo
+    try {
+        await db.query('UPDATE todo SET message=$1, status=$2 WHERE id=$3', [params.message, params.status, params.id])
         response.status(201).send("200 Ok")
-    } else {
-        response.status(404).send("resource doesnt exist")
+    } catch (err) {
+        response.status(500).send("Internal Server Err");
     }
 })
 
 //DELETE /delete/:id  #delete todo
-app.delete("/delete/:id", (request: Request, response: Response) => {
-    const id: number = Number(request.params.id)
-    let index = container.findIndex((todo: Todo) => {Number(todo.id) === id})
-    if (index !== -1) {
-        container = container.filter(todo => Number(todo.id) !== id);
-        response.status(201).send("resource was deleted")
-    } else {
-        response.status(404).send("resource doesnt exist")
+app.delete("/delete/:id", async (request, response) => {
+    const id = request.params.id;
+    try {
+        await db.query('DELETE FROM todo WHERE id=$1', [id]);
+        response.status(201).send("resource was deleted");
+    } catch (err) {
+        response.status(404).send("resource doesnt exist");
     }
-})
+});
 
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`)
