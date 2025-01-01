@@ -24,10 +24,26 @@ export default function Home():any {
       console.error(error);
     }
   }
+
+  const handleDelete = async (event, id) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:3001/delete/${id}`, {
+        method: "DELETE",
+      })
+      console.log("twas a success",response.status)
+    } catch(error) {
+      console.error("delete not successful", error)
+    }
+  }
   
   useEffect(() => {
     getData()
   }, [])
+
+  useEffect(() => {
+    getData()
+  }, [handleDelete])
 
   return (
     <div className={styles.page}>
@@ -35,7 +51,7 @@ export default function Home():any {
       <>
       <h1>Todo App</h1>
           {todo.map((task: Todo) => (
-            <TodoCard key={task.id} todo={task}/>
+            <TodoCard key={task.id} todo={task} handleDelete={handleDelete}/>
           ))}
       </>
       </main>

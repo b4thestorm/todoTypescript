@@ -63,6 +63,7 @@ const Close_1 = __importDefault(require("@mui/icons-material/Close"));
 function TodoCard({ todo }) {
     // eslint-disable-next-line   @typescript-eslint/no-unused-vars
     const [editable, setEditable] = (0, react_1.useState)(false);
+    const [renderCount, setRerender] = (0, react_1.useState)(0);
     const [todoState, setTodoState] = (0, react_1.useState)({
         id: todo.id || crypto.randomUUID(),
         message: todo.message || '',
@@ -80,6 +81,8 @@ function TodoCard({ todo }) {
                 method: "DELETE",
             });
             console.log("twas a success", response.status);
+            setRerender(prevCount => prevCount + 1);
+            console.log("rerender", renderCount)
         }
         catch (error) {
             console.error("delete not successful", error);
@@ -106,7 +109,7 @@ function TodoCard({ todo }) {
                 <CardMedia_1.default>
                 <IconButton_1.default sx={{ position: 'absolute', top: 0, right: 0 }} onClick={handleDelete}>
                   <Close_1.default />
-                 </IconButton_1.default>
+                </IconButton_1.default>
                 {!editable ? (<Typography_1.default gutterBottom variant="h5" component="div">
                       {todoState.message}
                     </Typography_1.default>) : (<TextField_1.default id="outlined-multiline-static" label="What do you want to do with your time" value={todoState.message} onChange={messageChange} multiline rows={3} sx={{

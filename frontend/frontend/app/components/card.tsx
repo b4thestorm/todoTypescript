@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export default function TodoCard({todo})  {
+export default function TodoCard({todo, handleDelete})  {
   // eslint-disable-next-line   @typescript-eslint/no-unused-vars
   const [editable, setEditable] = useState(false)
   const [todoState, setTodoState] = useState({
@@ -26,18 +26,7 @@ export default function TodoCard({todo})  {
     true: 'Done',
     false: 'Doing'
   }
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  const handleDelete = async (event) => {
-    event.preventDefault();
-    try {
-      const response = await fetch(`http://localhost:3001/delete/${todoState.id}`, {
-        method: "DELETE",
-      })
-      console.log("twas a success",response.status)
-    } catch(error) {
-      console.error("delete not successful", error)
-    }
-  }
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -64,10 +53,10 @@ export default function TodoCard({todo})  {
                 <CardMedia>
                 <IconButton
                   sx={{ position: 'absolute', top: 0, right: 0 }}
-                  onClick={handleDelete}
+                  onClick={(event) => handleDelete(event, todoState.id)}
                 >
                   <CloseIcon />
-                 </IconButton>
+                </IconButton>
                 {!editable ? (
                     <Typography gutterBottom variant="h5" component="div">
                       {todoState.message}
