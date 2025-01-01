@@ -50,6 +50,9 @@ app.post("/create", (request, response, next) => __awaiter(void 0, void 0, void 
         if (res.rows.length === 1) {
             response.status(400).send("resource already exist");
         }
+        else {
+            next();
+        }
     }
     catch (err) {
         response.status(500).send("Internal Server Error");
@@ -90,16 +93,16 @@ app.put("/update/:id", (request, response, next) => __awaiter(void 0, void 0, vo
     }
 }));
 //DELETE /delete/:id  #delete todo
-app.delete("/delete/:id", (request, response) => {
+app.delete("/delete/:id", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const id = request.params.id;
     try {
-        db.query('DELETE FROM todo WHERE id=$1', [id]);
+        yield db.query('DELETE FROM todo WHERE id=$1', [id]);
         response.status(201).send("resource was deleted");
     }
     catch (err) {
         response.status(404).send("resource doesnt exist");
     }
-});
+}));
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
 });

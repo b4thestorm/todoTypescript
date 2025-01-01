@@ -40,17 +40,19 @@ app.get("/list" , async (request: Request, response: Response) => {
 })
 
 //POST /create #add todos
-app.post("/create", async (request, response, next) => {
+app.post("/create", async (request: Request, response: Response, next: NextFunction) => {
     const params = request.query;
     try {
         const res = await db.query('SELECT * FROM todo WHERE id=$1', [params.id])
         if (res.rows.length === 1) {
             response.status(400).send("resource already exist");
+        } else {
+            next()
         }
     } catch (err) {
         response.status(500).send("Internal Server Error");
     }
-}, async (request, response) => { 
+}, async (request: Request, response: Response) => { 
     const params = request.query;
     try {
         await db.query('INSERT INTO todo (id, message, status) VALUES ($1, $2, $3)', [params.id, params.message, params.status]);
@@ -73,7 +75,7 @@ app.put("/update/:id", async(request: Request, response: Response, next: NextFun
     } catch (err) {
         response.status(500).send("Internal Server Error");
     }
-}, async(request, response) => {
+}, async(request: Request, response: Response) => {
     const params: Todo = request.query as unknown as Todo
     try {
         await db.query('UPDATE todo SET message=$1, status=$2 WHERE id=$3', [params.message, params.status, params.id])
@@ -84,7 +86,7 @@ app.put("/update/:id", async(request: Request, response: Response, next: NextFun
 })
 
 //DELETE /delete/:id  #delete todo
-app.delete("/delete/:id", async (request, response) => {
+app.delete("/delete/:id", async (request: Request, response: Response) => {
     const id = request.params.id;
     try {
         await db.query('DELETE FROM todo WHERE id=$1', [id]);
