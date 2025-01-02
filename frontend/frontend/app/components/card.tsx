@@ -23,9 +23,9 @@ export default function TodoCard({todo, setRerender}: TodoCardProps)  {
   // eslint-disable-next-line   @typescript-eslint/no-unused-vars
   const [editable, setEditable] = useState(false)
   const [todoState, setTodoState] = useState({
-      id: todo?.id || crypto.randomUUID(), 
-      message: todo?.message || '',
-      status: todo?.status || false
+      id: todo?.id, 
+      message: todo?.message,
+      status: todo?.status
   })
 
   const STATUS = {
@@ -33,14 +33,23 @@ export default function TodoCard({todo, setRerender}: TodoCardProps)  {
     "false": 'Doing'
   }
 
-
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     const response = await fetch('http://localhost:3001/create', {
-      method: "POST",
+      method: 'POST',
+      mode: 'cors', // this cannot be 'no-cors'
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(todoState)
     })
-    console.log(response.status)
+    if (setRerender) {
+      //typescript is not happy with this
+      setRerender((renderCount: number) => renderCount + 1)
+    }
+    console.log("response", response)
   }
 
   const handleDelete = async (event, id) => {
@@ -50,15 +59,17 @@ export default function TodoCard({todo, setRerender}: TodoCardProps)  {
         method: "DELETE",
       })
       console.log("twas a success",response.status)
-      setRerender((renderCount: number) => renderCount + 1)
+      if (setRerender) {
+        //typescript is not happy with this
+        setRerender((renderCount: number) => renderCount + 1)
+      }
     } catch(error) {
       console.error("delete not successful", error)
     }
   }
 
   const messageChange = (event): void => {
-    setTodoState((prevState) => ({...prevState, message: event.target.value})
-    )
+    setTodoState((prevState) => ({...prevState, message: event.target.value}))
   }
   const statusChange = (): void => {
     setTodoState((prevState) => ({...prevState, status: !prevState.status}))

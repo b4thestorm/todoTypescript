@@ -15,13 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const pg_1 = require("pg");
 const dotenv_1 = __importDefault(require("dotenv"));
-const body_parser_1 = __importDefault(require("body-parser"));
+// import bodyparser from 'body-parser'
 const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3001;
-app.use(body_parser_1.default.json());
-app.use(body_parser_1.default.urlencoded({ extended: true }));
+app.use(express_1.default.json());
+// app.use(bodyparser.json())
+// app.use(bodyparser.urlencoded({extended: false}))
 const db = new pg_1.Client({
     user: 'arnoldsanders',
     host: 'localhost',
@@ -29,11 +30,12 @@ const db = new pg_1.Client({
     database: 'locktransaction',
 });
 db.connect();
-var corsOptions = {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'PUT', 'POST', 'DELETE']
-};
-app.use((0, cors_1.default)(corsOptions));
+// var corsOptions = {
+//     origin: 'http://localhost:3000',
+//     methods: ['GET', 'PUT', 'POST', 'DELETE']
+// }
+// corsOptions
+app.use((0, cors_1.default)());
 app.get("/", (request, response) => {
     response.status(201).send("Welcome to another Typescript Todo App");
 });
@@ -44,7 +46,7 @@ app.get("/list", (request, response) => __awaiter(void 0, void 0, void 0, functi
 }));
 //POST /create #add todos
 app.post("/create", (request, response, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const params = request.query;
+    const params = request.body;
     try {
         const res = yield db.query('SELECT * FROM todo WHERE id=$1', [params.id]);
         if (res.rows.length === 1) {
@@ -58,13 +60,13 @@ app.post("/create", (request, response, next) => __awaiter(void 0, void 0, void 
         response.status(500).send("Internal Server Error");
     }
 }), (request, response) => __awaiter(void 0, void 0, void 0, function* () {
-    const params = request.query;
+    const params = request.body;
     try {
-        yield db.query('INSERT INTO todo (id, message, status) VALUES ($1, $2, $3)', [params.id, params.message, params.status]);
+        db.query('INSERT INTO todo (id, message, status) VALUES ($1, $2, $3)', [params.id, params.message, params.status]);
         response.status(201).send("200 Ok");
     }
     catch (err) {
-        response.status(500).send("Internal Server Error");
+        response.status(500).send("Internal Server Err");
     }
 }));
 //UPDATE /update/:id todos

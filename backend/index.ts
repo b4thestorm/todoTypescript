@@ -1,7 +1,7 @@
 import express, {Express, NextFunction, Request, Response} from "express";
 import { Client } from "pg";
 import dotenv from "dotenv";
-import bodyparser from 'body-parser'
+// import bodyparser from 'body-parser'
 import cors from 'cors'
 import Todo from "../types/todo";
 
@@ -9,8 +9,9 @@ dotenv.config();
 
 const app: Express  = express();
 const port: string | number = process.env.PORT || 3001;
-app.use(bodyparser.json())
-app.use(bodyparser.urlencoded({extended: true}))
+app.use(express.json())
+// app.use(bodyparser.json())
+// app.use(bodyparser.urlencoded({extended: false}))
 
 const db = new Client({
     user: 'arnoldsanders',
@@ -21,13 +22,13 @@ const db = new Client({
 
 db.connect()
 
-var corsOptions = {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'PUT', 'POST', 'DELETE']
-}
+// var corsOptions = {
+//     origin: 'http://localhost:3000',
+//     methods: ['GET', 'PUT', 'POST', 'DELETE']
+// }
 
-
-app.use(cors(corsOptions))
+// corsOptions
+app.use(cors())
 
 app.get("/", (request: Request, response: Response) => {
     response.status(201).send("Welcome to another Typescript Todo App");
@@ -41,7 +42,7 @@ app.get("/list" , async (request: Request, response: Response) => {
 
 //POST /create #add todos
 app.post("/create", async (request: Request, response: Response, next: NextFunction) => {
-    const params = request.query;
+    const params = request.body;
     try {
         const res = await db.query('SELECT * FROM todo WHERE id=$1', [params.id])
         if (res.rows.length === 1) {
@@ -53,12 +54,12 @@ app.post("/create", async (request: Request, response: Response, next: NextFunct
         response.status(500).send("Internal Server Error");
     }
 }, async (request: Request, response: Response) => { 
-    const params = request.query;
+    const params = request.body;
     try {
-        await db.query('INSERT INTO todo (id, message, status) VALUES ($1, $2, $3)', [params.id, params.message, params.status]);
+        db.query('INSERT INTO todo (id, message, status) VALUES ($1, $2, $3)', [params.id, params.message, params.status]);
         response.status(201).send("200 Ok");
     } catch (err) {
-        response.status(500).send("Internal Server Error");
+        response.status(500).send("Internal Server Err");
     }
 })
 

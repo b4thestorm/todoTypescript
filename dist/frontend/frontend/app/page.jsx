@@ -50,9 +50,15 @@ exports.default = Home;
 const react_1 = __importStar(require("react"));
 const page_module_css_1 = __importDefault(require("./page.module.css"));
 const card_1 = __importDefault(require("./components/card"));
+const IconButton_1 = __importDefault(require("@mui/material/IconButton"));
+const Add_1 = __importDefault(require("@mui/icons-material/Add"));
+const Box_1 = __importDefault(require("@mui/material/Box"));
+const Stack_1 = __importDefault(require("@mui/material/Stack"));
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 function Home() {
     const [todo, setTodo] = (0, react_1.useState)([]);
+    const [preview, setPreview] = (0, react_1.useState)(false);
+    const [rerender, setRerender] = (0, react_1.useState)(0);
     function getData() {
         return __awaiter(this, void 0, void 0, function* () {
             const url = "http://localhost:3001/list";
@@ -69,14 +75,36 @@ function Home() {
             }
         });
     }
+    //INITIAL RENDER
     (0, react_1.useEffect)(() => {
         getData();
     }, []);
+    // RE-RENDER
+    (0, react_1.useEffect)(() => {
+        getData();
+    }, [rerender]);
     return (<div className={page_module_css_1.default.page}>
       <main className={page_module_css_1.default.main}>
       <>
-      <h1>Todo App</h1>
-          {todo.map((task) => (<card_1.default key={task.id} todo={task}/>))}
+      <Box_1.default sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '50px' }}>
+        <h1>Todo App</h1>
+        <IconButton_1.default sx={{
+            position: 'relative',
+            top: 0,
+            right: 0,
+        }} color="success" onClick={() => setPreview(true)}>
+          <Add_1.default />
+        </IconButton_1.default>
+      </Box_1.default>
+      <Stack_1.default spacing={2}>
+          {preview && (<Box_1.default>
+              <card_1.default todo={{ id: crypto.randomUUID(), message: '', status: false }}/>
+            </Box_1.default>)}
+
+          {todo.map((task) => (<Box_1.default key={crypto.randomUUID()}>
+              <card_1.default todo={task} setRerender={setRerender}/>
+            </Box_1.default>))}
+      </Stack_1.default>
       </>
       </main>
     </div>);

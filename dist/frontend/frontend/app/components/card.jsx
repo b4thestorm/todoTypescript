@@ -59,42 +59,47 @@ const Chip_1 = __importDefault(require("@mui/joy/Chip"));
 const Box_1 = __importDefault(require("@mui/material/Box"));
 const IconButton_1 = __importDefault(require("@mui/material/IconButton"));
 const Close_1 = __importDefault(require("@mui/icons-material/Close"));
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-function TodoCard({ todo }) {
+function TodoCard({ todo, setRerender }) {
     // eslint-disable-next-line   @typescript-eslint/no-unused-vars
     const [editable, setEditable] = (0, react_1.useState)(false);
-    const [renderCount, setRerender] = (0, react_1.useState)(0);
     const [todoState, setTodoState] = (0, react_1.useState)({
-        id: todo.id || crypto.randomUUID(),
-        message: todo.message || '',
-        status: todo.status || false
+        id: todo === null || todo === void 0 ? void 0 : todo.id,
+        message: todo === null || todo === void 0 ? void 0 : todo.message,
+        status: todo === null || todo === void 0 ? void 0 : todo.status
     });
     const STATUS = {
-        true: 'Done',
-        false: 'Doing'
+        "true": 'Done',
+        "false": 'Doing'
     };
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    const handleDelete = (event) => __awaiter(this, void 0, void 0, function* () {
+    const handleSubmit = (event) => __awaiter(this, void 0, void 0, function* () {
+        event.preventDefault();
+        console.log("before request", JSON.stringify(todoState));
+        const response = yield fetch('http://localhost:3001/create', {
+            method: 'POST',
+            mode: 'cors', // this cannot be 'no-cors'
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(todoState)
+        });
+        console.log("response", response);
+    });
+    const handleDelete = (event, id) => __awaiter(this, void 0, void 0, function* () {
         event.preventDefault();
         try {
-            const response = yield fetch(`http://localhost:3001/delete/${todoState.id}`, {
+            const response = yield fetch(`http://localhost:3001/delete/${id}`, {
                 method: "DELETE",
             });
             console.log("twas a success", response.status);
-            setRerender(prevCount => prevCount + 1);
-            console.log("rerender", renderCount)
+            if (setRerender) {
+                //typescript is not happy with this
+                setRerender((renderCount) => renderCount + 1);
+            }
         }
         catch (error) {
             console.error("delete not successful", error);
         }
-    });
-    const handleSubmit = (event) => __awaiter(this, void 0, void 0, function* () {
-        event.preventDefault();
-        const response = yield fetch('http://localhost:3001/create', {
-            method: "POST",
-            body: JSON.stringify(todoState)
-        });
-        console.log(response.status);
     });
     const messageChange = (event) => {
         setTodoState((prevState) => (Object.assign(Object.assign({}, prevState), { message: event.target.value })));
@@ -107,9 +112,9 @@ function TodoCard({ todo }) {
             <CardActionArea_1.default>
               <CardContent_1.default>
                 <CardMedia_1.default>
-                <IconButton_1.default sx={{ position: 'absolute', top: 0, right: 0 }} onClick={handleDelete}>
-                  <Close_1.default />
-                </IconButton_1.default>
+                {setRerender && (<IconButton_1.default sx={{ position: 'absolute', top: 0, right: 0 }} onClick={(event) => handleDelete(event, todoState.id)}>
+                    <Close_1.default />
+                  </IconButton_1.default>)}
                 {!editable ? (<Typography_1.default gutterBottom variant="h5" component="div">
                       {todoState.message}
                     </Typography_1.default>) : (<TextField_1.default id="outlined-multiline-static" label="What do you want to do with your time" value={todoState.message} onChange={messageChange} multiline rows={3} sx={{
@@ -123,7 +128,7 @@ function TodoCard({ todo }) {
             justifyContent: 'space-between',
             marginTop: '50px',
         }}>
-                  <Chip_1.default>{STATUS[todoState.status]}</Chip_1.default>
+                  <Chip_1.default>{STATUS[String(todoState.status)]}</Chip_1.default>
                   <Switch_1.default disabled={!editable} onChange={statusChange} name="status"/>
                   {editable ? (<>
                       <Button_1.default variant="contained" onClick={handleSubmit}>Confirm</Button_1.default>

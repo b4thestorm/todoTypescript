@@ -61,7 +61,7 @@ export default function Home():any {
       <Stack spacing={2}>
           {preview && (
             <Box>
-              <TodoCard todo={{id: crypto.randomUUID(), message: '', status: false}}/>
+              <TodoCard todo={{id: crypto.randomUUID(), message: '', status: false}} setRerender={setRerender}/>
             </Box>
           )}
 
