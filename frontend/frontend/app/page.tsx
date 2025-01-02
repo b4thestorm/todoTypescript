@@ -6,10 +6,13 @@ import TodoCard from './components/card';
 import Todo from '../../../types/todo';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
+import Box from '@mui/material/Box';
+import Stack  from '@mui/material/Stack';
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export default function Home():any {
   const [todo, setTodo] = useState([])
+  const [preview, setPreview] = useState(false)
   const [rerender, setRerender] = useState(0)
 
   async function getData() {
@@ -42,13 +45,32 @@ export default function Home():any {
     <div className={styles.page}>
       <main className={styles.main}>
       <>
-      <IconButton>
-        <AddIcon/>
-      </IconButton>
-      <h1>Todo App</h1>
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '50px'}}>
+        <h1>Todo App</h1>
+        <IconButton  sx={{
+          position: 'relative',
+          top: 0,
+          right: 0,
+          }} 
+          color="success"
+          onClick={() => setPreview(true)}
+          >
+          <AddIcon/>
+        </IconButton>
+      </Box>
+      <Stack spacing={2}>
+          {preview && (
+            <Box>
+              <TodoCard todo={{id: crypto.randomUUID(), message: '', status: false}}/>
+            </Box>
+          )}
+
           {todo.map((task: Todo) => (
-            <TodoCard key={task.id} todo={task} setRerender={setRerender}/>
+            <Box key={crypto.randomUUID()}>
+              <TodoCard todo={task} setRerender={setRerender}/>
+            </Box>
           ))}
+      </Stack>
       </>
       </main>
     </div>

@@ -11,20 +11,26 @@ import Chip from '@mui/joy/Chip';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import Todo from '../../../../types/todo';
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export default function TodoCard({todo, setRerender})  {
+interface TodoCardProps {
+  todo?: Todo;
+  setRerender?: (number) => void;
+}
+
+export default function TodoCard({todo, setRerender}: TodoCardProps)  {
   // eslint-disable-next-line   @typescript-eslint/no-unused-vars
   const [editable, setEditable] = useState(false)
   const [todoState, setTodoState] = useState({
-      id: todo.id || crypto.randomUUID(), 
-      message: todo.message || '',
-      status: todo.status || false
+      id: todo?.id || crypto.randomUUID(), 
+      message: todo?.message || '',
+      status: todo?.status || false
   })
 
   const STATUS = {
-    true: 'Done',
-    false: 'Doing'
+    "true": 'Done',
+    "false": 'Doing'
   }
 
 
@@ -44,7 +50,7 @@ export default function TodoCard({todo, setRerender})  {
         method: "DELETE",
       })
       console.log("twas a success",response.status)
-      setRerender(renderCount => renderCount + 1)
+      setRerender((renderCount: number) => renderCount + 1)
     } catch(error) {
       console.error("delete not successful", error)
     }
@@ -64,12 +70,14 @@ export default function TodoCard({todo, setRerender})  {
             <CardActionArea>
               <CardContent>
                 <CardMedia>
-                <IconButton
-                  sx={{ position: 'absolute', top: 0, right: 0 }}
-                  onClick={(event) => handleDelete(event, todoState.id)}
-                >
-                  <CloseIcon />
-                </IconButton>
+                {setRerender && (
+                  <IconButton
+                    sx={{ position: 'absolute', top: 0, right: 0 }}
+                    onClick={(event) => handleDelete(event, todoState.id)}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                )}
                 {!editable ? (
                     <Typography gutterBottom variant="h5" component="div">
                       {todoState.message}
@@ -95,7 +103,7 @@ export default function TodoCard({todo, setRerender})  {
                   justifyContent: 'space-between',
                   marginTop: '50px',
                 }}>
-                  <Chip>{STATUS[todoState.status]}</Chip>
+                  <Chip>{STATUS[String(todoState.status)]}</Chip>
                   <Switch disabled={!editable} onChange={statusChange} name="status"/>
                   {editable ? (
                     <>
