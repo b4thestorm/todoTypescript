@@ -22,13 +22,12 @@ const db = new Client({
 
 db.connect()
 
-// var corsOptions = {
-//     origin: 'http://localhost:3000',
-//     methods: ['GET', 'PUT', 'POST', 'DELETE']
-// }
+var corsOptions = {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'PUT', 'POST', 'DELETE']
+}
 
-// corsOptions
-app.use(cors())
+app.use(cors(corsOptions))
 
 app.get("/", (request: Request, response: Response) => {
     response.status(201).send("Welcome to another Typescript Todo App");
